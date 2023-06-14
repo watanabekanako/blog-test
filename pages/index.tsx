@@ -76,15 +76,21 @@ const BlogList = () => {
       .then((response) => setPosts(response.data));
   }, []);
 
+  // const onDeleteClick = (id: number) => {
+  //   axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
+  //     setPosts(response.data);
+  //     closeModal();
+  //     router.push("/");
+  //   });
+  // };
   const onDeleteClick = (id: number) => {
-    try {
-      axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
+    axios.delete(`http://localhost:3000/posts/${id}`).then(() => {
+      axios.get(`http://localhost:3000/posts/`).then((response) => {
         setPosts(response.data);
         closeModal();
+        router.push("/");
       });
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
