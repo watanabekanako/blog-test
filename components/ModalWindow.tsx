@@ -19,13 +19,15 @@ type Props = {
   content: string;
   children: any;
   onClickButton: () => void;
-  onClose: () => void;
+  // onClose: () => void;
 };
 
-const ModalWindow = ({ content, children, onClickButton, onClose }: Props) => {
+const ModalWindow = ({ content, children, onClickButton }: Props) => {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <div>
       <Button onClick={handleOpen}>{children}</Button>

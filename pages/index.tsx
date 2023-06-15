@@ -25,9 +25,24 @@ import DefaultLayout from "../components/layout/defaultLayout";
 import Link from "next/link";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import { useRouter } from "next/router";
-import style from "styled-jsx/style";
+import useGetPosts from "../hooks/useGetPosts";
+import { mutate, useSWRConfig } from "swr";
+import useSWR from "swr";
+type Post = {
+  post: [
+    {
+      id: number;
+      title: string;
+      content?: string;
+      description: string;
+      categoryId: number;
+      createdAt: Date;
+    }
+  ];
+};
 const drawerWidth = 240;
 
+// console.log(hookPost, "hook");
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
@@ -54,13 +69,20 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: "flex-end",
 }));
-
+// const hookPost = useGetPosts();
 const BlogList = () => {
+  const router = useRouter();
+  const hookPost = useGetPosts({ page: 3 });
+  const [posts, setPosts] = React.useState<Post>();
+  const [selectedCategory, setSelectedCategory] = React.useState<any>();
   const [createdAt, setCreatedAt] = React.useState<any>("");
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const handleChange = (event: SelectChangeEvent) => {
     setCreatedAt(event.target.value);
   };
-  const [selectedCategory, setSelectedCategory] = React.useState<any>();
+
+  console.log(hookPost, "hook");
   React.useEffect(() => {
     axios
       .get(`http://localhost:3000/posts/categories/${6}`)
@@ -68,38 +90,36 @@ const BlogList = () => {
         setSelectedCategory(response.data);
       });
   }, []);
-  const router = useRouter();
-  const [posts, setPosts] = React.useState<any>();
+
   React.useEffect(() => {
     axios
       .get(`http://localhost:3000/posts/`)
       .then((response) => setPosts(response.data));
   }, []);
-
-  // const onDeleteClick = (id: number) => {
-  //   axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
-  //     setPosts(response.data);
-  //     closeModal();
-  //     router.push("/");
-  //   });
-  // };
-  const onDeleteClick = (id: number) => {
-    axios.delete(`http://localhost:3000/posts/${id}`).then(() => {
-      axios.get(`http://localhost:3000/posts/`).then((response) => {
-        setPosts(response.data);
-        closeModal();
-        router.push("/");
-      });
-    });
-  };
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+  // 投稿削除
+  const { data: post, error: postsError } = useSWR(
+    "http://localhost:3000/posts/",
+    (url) => axios.get(url).then((response) => response.data)
+  );
+  const onDeleteClick = (id: number) => {
+    axios.delete(`http://localhost:3000/posts/${id}`).then(() => {
+      mutate("http://localhost:3000/posts/");
+      closeModal();
+      // console.log(isModalOpen, "モーダル");
+    });
+    // axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
+    //   axios.get(`http://localhost:3000/posts/`).then((response) => {
+    //     setPosts(response.data);
+    //     closeModal();
+    //     router.push("/");
+    //   });
+    // });
+    // axios.delete(`http://localhost:3000/posts/`).then(() => {
+    //   refetch();
+    // });
   };
 
   return (
@@ -158,7 +178,7 @@ const BlogList = () => {
                         content={"uuuuuuu"}
                         children={<DeleteIcon sx={{ color: "gray" }} />}
                         onClickButton={() => onDeleteClick(data.id)}
-                        onClose={closeModal}
+                        // onClose={() => setIsModalOpen(false)}
                       />
                     </TableCell>
                   </TableRow>
