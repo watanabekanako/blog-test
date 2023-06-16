@@ -83,8 +83,8 @@ const Post = ({ post }: any) => {
             登録する
           </PrimaryButton> */}
           <PrimaryButton
-            // onClick={(e: any) => handleSubmit(e)}
-            onClick={handleSubmit}
+            onClick={(e: any) => handleSubmit(e)}
+            // onClick={handleSubmit}
             disabled={disabled}
           >
             登録する
