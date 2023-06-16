@@ -3,8 +3,8 @@ import Button, { ButtonProps } from "@mui/material/Button";
 type Props = {
   children: string;
 
-  onClick: () => void;
-  // onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  // onClick: () => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   disabled: boolean;
 };
 const PrimaryButton = (props: Props) => {
