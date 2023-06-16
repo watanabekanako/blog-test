@@ -7,6 +7,8 @@ import ModalWindow from "../components/ModalWindow";
 import _ from "lodash";
 import {
   Button,
+  FormControl,
+  InputLabel,
   MenuItem,
   Modal,
   Paper,
@@ -18,16 +20,17 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
 import axios from "axios";
 import DefaultLayout from "../components/layout/defaultLayout";
 import Link from "next/link";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import { useRouter } from "next/router";
-import useGetPosts from "../hooks/useGetPosts";
 import { mutate, useSWRConfig } from "swr";
 import useSWR from "swr";
+import useGetSelectedPost from "../hooks/useGetSelectedPost";
+import useGetPosts from "../hooks/useGetPosts";
+import useGetAllCategory from "../hooks/useGetAllCategory";
 type Post = {
   post: [
     {
@@ -40,9 +43,8 @@ type Post = {
     }
   ];
 };
-const drawerWidth = 240;
 
-// console.log(hookPost, "hook");
+const drawerWidth = 240;
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
@@ -69,7 +71,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: "flex-end",
 }));
-// const hookPost = useGetPosts();
 const BlogList = () => {
   const router = useRouter();
   const hookPost = useGetPosts({ page: 3 });
@@ -78,37 +79,41 @@ const BlogList = () => {
   const [createdAt, setCreatedAt] = React.useState<any>("");
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
+  const { allCategories } = useGetAllCategory();
+  console.log(allCategories, "allcategories");
+
   const handleChange = (event: SelectChangeEvent) => {
-    setCreatedAt(event.target.value);
+    setSelectedCategory(event.target.value as string);
   };
-
-  console.log(hookPost, "hook");
-  React.useEffect(() => {
-    axios
-      .get(`http://localhost:3000/posts/categories/${6}`)
-      .then((response) => {
-        setSelectedCategory(response.data);
-      });
-  }, []);
-
-  React.useEffect(() => {
-    axios
-      .get(`http://localhost:3000/posts/`)
-      .then((response) => setPosts(response.data));
-  }, []);
+  // const { post, isLoading, isError } = useGetPosts({ page: 1 });
+  const { category, isLoading, isError } = useGetSelectedPost({
+    categoryId: 49,
+  });
+  console.log(category, "uuuuu");
+  console.log(selectedCategory, "selectCategory");
+  // React.useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:3000/posts/`)
+  //     .then((response) => setPosts(response.data));
+  // }, []);
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  // 投稿削除
-  const { data: post, error: postsError } = useSWR(
-    "http://localhost:3000/posts/",
-    (url) => axios.get(url).then((response) => response.data)
+
+  // const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const fetcher = (url: string) =>
+    axios.get(url).then((response) => response.data);
+
+  const { data, error } = useSWR(
+    `http://localhost:3000/posts?category=${49}`,
+    fetcher
   );
+
+  // 投稿削除
   const onDeleteClick = (id: number) => {
     axios.delete(`http://localhost:3000/posts/${id}`).then(() => {
       mutate("http://localhost:3000/posts/");
       closeModal();
-      // console.log(isModalOpen, "モーダル");
     });
     // axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
     //   axios.get(`http://localhost:3000/posts/`).then((response) => {
@@ -131,15 +136,37 @@ const BlogList = () => {
             <TableRow>
               <TableCell align="center">作成日</TableCell>
               <TableCell align="right">タイトル</TableCell>
-              <TableCell align="right">カテゴリ</TableCell>
+              <TableCell align="right">
+                <Box>
+                  {/* variantとlabelをなくすと枠が欠けないようになる */}
+                  <FormControl fullWidth variant="outlined">
+                    <Select
+                      id="demo-simple-select"
+                      value={selectedCategory}
+                      onChange={handleChange}
+                    >
+                      {allCategories?.categories?.map((data: any) => {
+                        return (
+                          <>
+                            <MenuItem value={10}>{data.name}</MenuItem>
+                          </>
+                        );
+                      })}
+                      <MenuItem value={10}>kkkkkk</MenuItem>
+                      <MenuItem value={20}>Twenty</MenuItem>
+                      <MenuItem value={30}>Thirty</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </TableCell>
               <TableCell align="right"></TableCell>
               <TableCell align="right"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {posts?.post &&
+            {data?.post &&
               _.map(
-                posts?.post,
+                data?.post,
                 (data: {
                   title: string;
                   createdAt: Date;
@@ -175,7 +202,7 @@ const BlogList = () => {
                     <TableCell align="right">
                       {/* モーダルの作成 */}
                       <ModalWindow
-                        content={"uuuuuuu"}
+                        content={"aaaaaaa"}
                         children={<DeleteIcon sx={{ color: "gray" }} />}
                         onClickButton={() => onDeleteClick(data.id)}
                         // onClose={() => setIsModalOpen(false)}
