@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import { useState } from "react";
 
 const style = {
   position: "absolute" as "absolute",
@@ -17,15 +18,17 @@ const style = {
 };
 type Props = {
   content: string;
-  children: any;
-  onClickButton: () => void;
-  onClose: () => void;
+  children: React.ReactNode;
 };
 
-const ModalWindow = ({ content, children, onClickButton, onClose }: Props) => {
-  const [open, setOpen] = React.useState(false);
+const ModalWindow = ({ content, children }: Props) => {
+  // モーダル表示非表示のstate
+  const [open, setOpen] = useState(false);
+  // モーダル表示処理
   const handleOpen = () => setOpen(true);
+  // モーダル非表示処理
   const handleClose = () => setOpen(false);
+  const onClickButton = () => {};
   return (
     <div>
       <Button onClick={handleOpen}>{children}</Button>
