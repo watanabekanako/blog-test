@@ -22,7 +22,6 @@ import {
   TableRow,
 } from "@mui/material";
 import axios from "axios";
-import DefaultLayout from "../components/layout/defaultLayout";
 import Link from "next/link";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import { useRouter } from "next/router";
@@ -77,20 +76,20 @@ const BlogList = () => {
   const [posts, setPosts] = React.useState<Post>();
   const [selectedCategory, setSelectedCategory] = React.useState<any>();
   const [createdAt, setCreatedAt] = React.useState<any>("");
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(true);
 
   const { allCategories } = useGetAllCategory();
-  console.log(allCategories, "allcategories");
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedCategory(event.target.value as string);
   };
+
+  console.log(selectedCategory, "selectCategory");
   // const { post, isLoading, isError } = useGetPosts({ page: 1 });
   const { category, isLoading, isError } = useGetSelectedPost({
     categoryId: 49,
   });
-  console.log(category, "uuuuu");
-  console.log(selectedCategory, "selectCategory");
+
   // React.useEffect(() => {
   //   axios
   //     .get(`http://localhost:3000/posts/`)
@@ -105,7 +104,7 @@ const BlogList = () => {
     axios.get(url).then((response) => response.data);
 
   const { data, error } = useSWR(
-    `http://localhost:3000/posts?category=${49}`,
+    `http://localhost:3000/posts?category=${selectedCategory}`,
     fetcher
   );
 
@@ -113,7 +112,7 @@ const BlogList = () => {
   const onDeleteClick = (id: number) => {
     axios.delete(`http://localhost:3000/posts/${id}`).then(() => {
       mutate("http://localhost:3000/posts/");
-      closeModal();
+      alert("uuuuu");
     });
     // axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
     //   axios.get(`http://localhost:3000/posts/`).then((response) => {
@@ -126,9 +125,9 @@ const BlogList = () => {
     //   refetch();
     // });
   };
-
+  console.log("isModalOpen", isModalOpen);
   return (
-    <DefaultLayout>
+    <>
       <DrawerHeader />
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -147,14 +146,11 @@ const BlogList = () => {
                     >
                       {allCategories?.categories?.map((data: any) => {
                         return (
-                          <>
-                            <MenuItem value={10}>{data.name}</MenuItem>
-                          </>
+                          <MenuItem key={data.id} value={data.id}>
+                            {data.name}
+                          </MenuItem>
                         );
                       })}
-                      <MenuItem value={10}>kkkkkk</MenuItem>
-                      <MenuItem value={20}>Twenty</MenuItem>
-                      <MenuItem value={30}>Thirty</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
@@ -203,9 +199,12 @@ const BlogList = () => {
                       {/* モーダルの作成 */}
                       <ModalWindow
                         content={"aaaaaaa"}
+                        // 開閉フラグ
                         children={<DeleteIcon sx={{ color: "gray" }} />}
-                        onClickButton={() => onDeleteClick(data.id)}
+                        // onClickButton={() => onDeleteClick(data.id)}
                         // onClose={() => setIsModalOpen(false)}
+                        // open={undefined}
+                        // setOpen={undefined}
                       />
                     </TableCell>
                   </TableRow>
@@ -214,7 +213,7 @@ const BlogList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </DefaultLayout>
+    </>
   );
 };
 // export async function getStaticProps() {

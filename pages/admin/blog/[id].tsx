@@ -55,42 +55,40 @@ const Post = ({ post }: any) => {
   // await axios.put(`http://localhost:3000/posts/${id}`, formValues);
   return (
     <>
-      <DefaultLayout>
-        <Box sx={{ width: "1000px", m: "auto " }}>
-          <TextField
-            sx={{ width: "80%" }}
-            onBlur={() => setOnBlur(true)}
-            value={formValues.title ?? ""}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              // setFormValues({ ...formValues, title: event.target.value })
-              setFormValues({ ...formValues, title: event.target.value })
-            }
-            error={formErrors}
-            helperText={errorMessage}
-          ></TextField>
-          <TextField
-            sx={{ width: "80%" }}
-            onBlur={() => setOnBlur(true)}
-            value={formValues?.content ?? ""}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-              setFormValues({ ...formValues, content: event.target.value })
-            }
-          ></TextField>
-          {/* <PrimaryButton
+      <Box sx={{ width: "1000px", m: "auto " }}>
+        <TextField
+          sx={{ width: "80%" }}
+          onBlur={() => setOnBlur(true)}
+          value={formValues.title ?? ""}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            // setFormValues({ ...formValues, title: event.target.value })
+            setFormValues({ ...formValues, title: event.target.value })
+          }
+          error={formErrors}
+          helperText={errorMessage}
+        ></TextField>
+        <TextField
+          sx={{ width: "80%" }}
+          onBlur={() => setOnBlur(true)}
+          value={formValues?.content ?? ""}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setFormValues({ ...formValues, content: event.target.value })
+          }
+        ></TextField>
+        {/* <PrimaryButton
             disabled={disabled}
             onClick={(event: any) => handleSubmit(event.target.value)}
           >
             登録する
           </PrimaryButton> */}
-          <PrimaryButton
-            onClick={(e: any) => handleSubmit(e)}
-            // onClick={handleSubmit}
-            disabled={disabled}
-          >
-            登録する
-          </PrimaryButton>
-        </Box>
-      </DefaultLayout>
+        <PrimaryButton
+          onClick={(e: any) => handleSubmit()}
+          // onClick={handleSubmit}
+          disabled={disabled}
+        >
+          登録する
+        </PrimaryButton>
+      </Box>
     </>
   );
 };
