@@ -1,29 +1,28 @@
+import useSWR from "swr";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+
 type Post = {
-  post: [
-    {
-      id: number;
-      title: string;
-      content?: string;
-      description: string;
-      categoryId: number;
-      createdAt: Date;
-    }
-  ];
+  id: number;
+  title: string;
+  content?: string;
+  description: string;
+  categoryId: number;
+  createdAt: Date;
 };
 
-const useGetPosts = ({ page }: any) => {
-  const [post, setPost] = useState<Post>();
+const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3000/posts?perPage=6&page=${page}`)
-      .then((response) => {
-        setPost(response.data);
-      });
-  }, [page]);
-  return { post };
+const useGetPosts = ({ page }: { page: number }) => {
+  const { data: post, error } = useSWR<Post[]>(
+    `http://localhost:3000/posts?perPage=6&page=${page}`,
+    fetcher
+  );
+
+  return {
+    post,
+    isLoading: !error && !post,
+    isError: error,
+  };
 };
 
 export default useGetPosts;
