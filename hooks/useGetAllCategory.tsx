@@ -1,12 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Category } from "../types/type";
-// type Category = {
-//   categories: {
-//     id: number;
-//     name: string;
-//   }[];
-// };
 // Categoryの配列
 type Categories = Category[];
 // apiからのレスポンスの形

@@ -30,6 +30,10 @@ import useSWR from "swr";
 import useGetSelectedPost from "../hooks/useGetSelectedPost";
 import useGetPosts from "../hooks/useGetPosts";
 import useGetAllCategory from "../hooks/useGetAllCategory";
+// import {
+//   PrimaryButton,
+//   SecondaryButton,
+// } from "../components/elements/Button/Button";
 type Post = {
   post: [
     {
@@ -90,40 +94,44 @@ const BlogList = () => {
     categoryId: 49,
   });
 
-  // React.useEffect(() => {
-  //   axios
-  //     .get(`http://localhost:3000/posts/`)
-  //     .then((response) => setPosts(response.data));
-  // }, []);
-  const closeModal = () => {
-    setIsModalOpen(false);
+  // const { data, error } = useSWR("http://localhost:3000/posts", fetcher);
+  // console.log(data, "swr");
+  // 投稿削除モーダル
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
   };
 
   // const fetcher = (url: string) => fetch(url).then((r) => r.json());
-  const fetcher = (url: string) =>
-    axios.get(url).then((response) => response.data);
+  // const fetcher = (url: string) =>
+  //   axios.get(url).then((response) => response.data);
+  const url = selectedCategory
+    ? `http://localhost:3000/posts?category=${selectedCategory}`
+    : "http://localhost:3000/posts";
 
-  const { data, error } = useSWR(
-    `http://localhost:3000/posts?category=${selectedCategory}`,
-    fetcher
-  );
+  const fetcher = (resource: string, init: Object) =>
+    fetch(resource, init).then((res) => res.json());
+  const { mutate } = useSWRConfig();
+  const { data, error } = useSWR("http://localhost:3000/posts", fetcher);
+  console.log(data, "swr");
 
-  // 投稿削除
-  const onDeleteClick = (id: number) => {
-    axios.delete(`http://localhost:3000/posts/${id}`).then(() => {
-      mutate("http://localhost:3000/posts/");
-      alert("uuuuu");
-    });
-    // axios.delete(`http://localhost:3000/posts/${id}`).then((response) => {
-    //   axios.get(`http://localhost:3000/posts/`).then((response) => {
-    //     setPosts(response.data);
-    //     closeModal();
-    //     router.push("/");
-    //   });
-    // });
-    // axios.delete(`http://localhost:3000/posts/`).then(() => {
-    //   refetch();
-    // });
+  // const handleDelete = (id: number) => {
+  //   axios.delete(`http://localhost:3000/posts/${id}`);
+  //   mutate("http://localhost:3000/posts/");
+  //   setOpen(false);
+  //   setSelectedCategory("");
+  // };
+  // キャンセルボタン押した後、選択したカテゴリ保持＋削除
+  const handleDelete = async (id: number) => {
+    await axios.delete(`http://localhost:3000/posts/${id}`);
+    mutate("http://localhost:3000/posts");
   };
   console.log("isModalOpen", isModalOpen);
   return (
@@ -196,8 +204,59 @@ const BlogList = () => {
                       </Button>
                     </TableCell>
                     <TableCell align="right">
+                      <div>
+                        {/* <button
+                          onClick={() => {
+                            fetch(`http://localhost:3000/posts/${data.id}`, {
+                              method: "DELETE",
+                            });
+                            mutate("http://localhost:3000/posts/");
+                          }}
+                        >
+                          [削除]
+                        </button> */}
+                        <button onClick={() => handleDelete(data.id)}>
+                          [削除]
+                        </button>
+                        {/* <Button onClick={handleOpen}>
+                          <DeleteIcon sx={{ color: "gray" }} />
+                        </Button>
+                        <Modal
+                          aria-labelledby="transition-modal-title"
+                          aria-describedby="transition-modal-description"
+                          open={open}
+                          onClose={handleClose}
+                          closeAfterTransition
+                          slots={{ backdrop: Backdrop }}
+                          slotProps={{
+                            backdrop: {
+                              timeout: 500,
+                            },
+                          }}
+                        >
+                          <Fade in={open}>
+                            <Box sx={style}>
+                              <Typography
+                                id="transition-modal-description"
+                                sx={{ mt: 2 }}
+                              >
+                                Duis mollis, est non commodo luctus, nisi erat
+                                porttitor ligula.
+                              </Typography>
+                              <PrimaryButton
+                                children={"削除する"}
+                                onClick={() => handleDelete(data.id)}
+                              />
+                              <SecondaryButton
+                                children={"キャンセル"}
+                                onClick={handleCancel}
+                              />
+                            </Box>
+                          </Fade>
+                        </Modal> */}
+                      </div>
                       {/* モーダルの作成 */}
-                      <ModalWindow
+                      {/* <ModalWindow
                         content={"aaaaaaa"}
                         // 開閉フラグ
                         children={<DeleteIcon sx={{ color: "gray" }} />}
@@ -205,7 +264,7 @@ const BlogList = () => {
                         // onClose={() => setIsModalOpen(false)}
                         // open={undefined}
                         // setOpen={undefined}
-                      />
+                      /> */}
                     </TableCell>
                   </TableRow>
                 )

@@ -1,16 +1,21 @@
 import axios from "axios";
 import { ReactEventHandler, useEffect, useState } from "react";
-import DefaultLayout from "../../../components/layout/defaultLayout";
 import React from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import { Box, TextField } from "@mui/material";
-import PrimaryButton from "../../../components/elements/Button/Button";
+import { PrimaryButton } from "../../../components/elements/Button/Button";
 import { useRouter } from "next/router";
-type Post = {
-  title: string;
-  content: string;
+import { Post } from "../../../types/type";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { format } from "date-fns";
+type PostResponse = {
+  post: {
+    post: Post;
+  };
 };
-const Post = ({ post }: any) => {
+const Post = ({ post }: PostResponse) => {
   const [onBlur, setOnBlur] = useState(false);
   const initialValues = { title: post.post.title, content: post.post.content };
   const [formValues, setFormValues] = useState<Post>(initialValues);
@@ -39,23 +44,36 @@ const Post = ({ post }: any) => {
   const params = useRouter();
   const { id } = params.query;
 
-  // const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-  //   if (formErrors === false) {
-  //     // await axios.put(`http//localhost:3000/posts/${id}`, formValues);
-  //     await axios.put(`http://localhost:3000/posts/${id}`, formValues);
-  //   }
-  // };
-  const handleSubmit = async () => {
+  const validate = (values: any) => {
+    const errors = { id: "1" };
+    return errors;
+  };
+  const handleSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     // e.preventDefault();
 
     if (formErrors === false) {
       await axios.put(`http://localhost:3000/posts/${id}`, formValues);
     }
   };
-  // await axios.put(`http://localhost:3000/posts/${id}`, formValues);
+  // Date型へ変換し初期値に設定
+  const [value, setValue] = React.useState<Date | null>(
+    new Date(formValues.createdAt)
+  );
+  console.log(typeof formValues.createdAt, "normal");
+  console.log(typeof value, "value");
   return (
     <>
-      <Box sx={{ width: "1000px", m: "auto " }}>
+      <Box sx={{ width: "1000px", m: "auto ", textAlign: "center" }}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            label="作成日・更新日"
+            // valueに渡ってくる値がDate型である必要がある
+            value={value}
+            onChange={(newValue) => setValue(newValue)}
+          />
+        </LocalizationProvider>
         <TextField
           sx={{ width: "80%" }}
           onBlur={() => setOnBlur(true)}
@@ -82,7 +100,7 @@ const Post = ({ post }: any) => {
             登録する
           </PrimaryButton> */}
         <PrimaryButton
-          onClick={(e: any) => handleSubmit()}
+          onClick={(e: any) => handleSubmit(e)}
           // onClick={handleSubmit}
           disabled={disabled}
         >

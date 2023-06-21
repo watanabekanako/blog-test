@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useState } from "react";
-
+import { PrimaryButton, SecondaryButton } from "./elements/Button/Button";
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -19,35 +19,50 @@ const style = {
 type Props = {
   content: string;
   children: React.ReactNode;
+  onDeleteClick: any;
+  handleOpen: any;
+  handleClose: any;
 };
 
-const ModalWindow = ({ content, children }: Props) => {
+const ModalWindow = ({
+  content,
+  children,
+  onDeleteClick,
+  handleOpen,
+  handleClose,
+}: Props) => {
   // モーダル表示非表示のstate
-  const [open, setOpen] = useState(false);
-  // モーダル表示処理
-  const handleOpen = () => setOpen(true);
-  // モーダル非表示処理
-  const handleClose = () => setOpen(false);
-  const onClickButton = () => {};
+  // const [open, setOpen] = useState(false);
+  // // モーダル表示処理
+  // const handleOpen = () => setOpen(true);
+  // // モーダル非表示処理
+  // const handleClose = () => setOpen(false);
+  // const CompleteButton = () => {
+  //   const action = () => {
+  //     completeAction();
+  //     handleClose();
+  //   };
+  //   return action;
+  // };
   return (
     <div>
       <Button onClick={handleOpen}>{children}</Button>
-      <Modal
-        open={open}
+      {/* <Modal
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {content}
-          </Typography>
-          <Button onClick={onClickButton}>削除します</Button>
+          <Box sx={{ textAlign: "center" }}>
+            <Typography id="modal-modal-description" sx={{ my: 2 }}>
+              {content}
+            </Typography>
+
+            <PrimaryButton onClick={onDeleteClick}>削除します</PrimaryButton>
+            <SecondaryButton onClick={handleClose}>キャンセル</SecondaryButton>
+          </Box>
         </Box>
-      </Modal>
+      </Modal> */}
     </div>
   );
 };
