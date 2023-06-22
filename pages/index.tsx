@@ -88,10 +88,6 @@ const BlogList = () => {
     router.push(`?category=${selectedCategory}&queryPage=${1}`);
   };
 
-  const { category, isLoading, isError } = useGetSelectedPost({
-    categoryId: 49,
-  });
-
   // 投稿削除モーダル
   const style = {
     position: "absolute" as "absolute",
@@ -106,7 +102,7 @@ const BlogList = () => {
   };
 
   const url = selectedCategory
-    ? `http://localhost:3000/posts?category=${selectedCategory}&queryPage=${queryPage}`
+    ? `http://localhost:3000/posts?category=${selectedCategory}&page=${queryPage}`
     : "http://localhost:3000/posts";
 
   const fetcher = (resource: string, init: Object) =>
@@ -124,7 +120,7 @@ const BlogList = () => {
 
   const [selectedPage, setSelectedPage] = React.useState<Number>();
   const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-    router.push(`?category=${selectedCategory}&page=${page}`);
+    router.push(`?category=${selectedCategory}&queryPage=${page}`);
     setSelectedPage(Number(page));
   };
 
@@ -268,17 +264,23 @@ const BlogList = () => {
         </Table>
       </TableContainer>
       <Stack spacing={2} sx={{ my: 4 }}>
-        <Pagination
-          count={Math.ceil(data?.totalCount / perPage)}
-          page={Number(selectedPage ? selectedPage : 1)}
-          onChange={(e: React.ChangeEvent<unknown>, page) => {
-            router.push(`?category=${selectedCategory}&queryPage=${page}`);
-            setSelectedPage(Number(page));
-          }}
-          // onChange={handlePageChange}
-          shape="rounded"
-          sx={{ m: "auto" }}
-        />
+        {data?.totalCount ? (
+          <>
+            <Pagination
+              count={Math.ceil(data?.totalCount / perPage)}
+              page={Number(selectedPage ? selectedPage : 1)}
+              onChange={(e: React.ChangeEvent<unknown>, page) => {
+                router.push(`?category=${selectedCategory}&queryPage=${page}`);
+                setSelectedPage(Number(page));
+              }}
+              // onChange={handlePageChange}
+              shape="rounded"
+              sx={{ m: "auto" }}
+            />
+          </>
+        ) : (
+          "検索結果がありません"
+        )}
       </Stack>
     </>
   );
