@@ -1,5 +1,6 @@
 import * as React from "react";
 import { styled, useTheme } from "@mui/material/styles";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import { format, compareAsc } from "date-fns";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,6 +22,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import axios from "axios";
@@ -32,6 +34,12 @@ import useSWR from "swr";
 import useGetSelectedPost from "../hooks/useGetSelectedPost";
 import useGetPosts from "../hooks/useGetPosts";
 import useGetAllCategory from "../hooks/useGetAllCategory";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
+import { PrimaryButton } from "../components/elements/Button/Button";
 type Post = {
   post: [
     {
@@ -124,15 +132,69 @@ const BlogList = () => {
     setSelectedPage(Number(page));
   };
 
+  const [value, setValue] = React.useState<Date | null>(new Date());
+  console.log(value, "value");
+  console.log(data?.post, "data");
+  const filterDate = data?.post.filter(
+    (data: any) => new Date(data.createdAt) < value!
+  );
+  console.log(filterDate, "find");
+
+  // 検索機能
+  const [searchWord, setSearchWord] = useState<string>();
+  // const handleSearch = async () => {
+  //   router.push(`?key=${searchWord}`);
+  //   await axios
+  //     .get(`http://localhost:3000/posts?key=${searchWord}`)
+  //     .then((response) => setPosts(response.data.post));
+  //   setSearchWord("");
+  // };
+  const handleSearch = async () => {
+    try {
+      await router.push(`?key=${searchWord}`);
+      const response = await axios.get(
+        `http://localhost:3000/posts?key=${searchWord}`
+      );
+      setPosts(response.data.post);
+      setSearchWord("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // 検索ワード
+  console.log(searchWord, "serach");
+  console.log(posts, "posts");
   return (
     <>
+      <TextField
+        value={searchWord}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setSearchWord(e.target.value)
+        }
+      />
+      <PrimaryButton
+        children={"検索する"}
+        onClick={handleSearch}
+        sx={{ my: 2 }}
+      />
       <DrawerHeader />
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="center">作成日</TableCell>
-              <TableCell align="right">タイトル</TableCell>
+              <TableCell align="center">
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    // label="Controlled picker"
+                    value={value}
+                    onChange={(newValue) => setValue(newValue)}
+                  />
+                </LocalizationProvider>
+              </TableCell>
+              <TableCell align="right">
+                {format(new Date(), "yyyy-MM-dd")}
+              </TableCell>
               <TableCell align="right">
                 <Box>
                   {/* variantとlabelをなくすと枠が欠けないようになる */}
